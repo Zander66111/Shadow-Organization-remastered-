@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shadow Organization HQ</title>
+
+<style>
+body{
+background:black;
+color:#00ff9f;
+font-family:Courier New;
+margin:0;
+}
+header{
+background:#001a14;
+padding:15px;
+text-align:center;
+border-bottom:1px solid #00ff9f;
+}
+#logo{
+font-size:26px;
+letter-spacing:4px;
+}
+#loginBox{
+position:absolute;
+top:40%;
+left:50%;
+transform:translate(-50%,-50%);
+border:1px solid #00ff9f;
+padding:30px;
+text-align:center;
+}
+input,button,textarea{
+background:black;
+border:1px solid #00ff9f;
+color:#00ff9f;
+padding:8px;
+margin:4px;
+}
+#panel{
+display:none;
+padding:20px;
+}
+.section{
+border:1px solid #00ff9f;
+margin-top:15px;
+padding:10px;
+}
+#terminal{
+height:180px;
+overflow:auto;
+border:1px solid #00ff9f;
+padding:10px;
+}
+#chatBox{
+height:150px;
+overflow:auto;
+border:1px solid #00ff9f;
+padding:10px;
+}
+.mapLocation{
+cursor:pointer;
+color:#00ffff;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div id="logo">SHADOW ORGANIZATION HQ</div>
+<div id="announcements">No announcements</div>
+</header>
+
+<div id="loginBox">
+<h2>Secure Login</h2>
+<input id="user" placeholder="Username"><br>
+<input id="pass" type="password" placeholder="Password"><br>
+<button onclick="loginUser()">ENTER</button>
+<p id="msg"></p>
+</div>
+
+<div id="panel">
+<h2 id="welcome"></h2>
+
+<div class="section">
+<h3>Live Status Dashboard</h3>
+<div id="status"></div>
+</div>
+
+<div class="section">
+<h3>AI Terminal</h3>
+<div id="terminal">Shadow AI Online</div>
+<input id="command" placeholder="command">
+</div>
+
+<div class="section">
+<h3>Mission Database</h3>
+<ul id="missions"></ul>
+<input id="mname" placeholder="Mission name">
+<input id="mloc" placeholder="Location">
+<button onclick="addMission()">Add Mission</button>
+</div>
+
+<div class="section">
+<h3>Agent Profiles</h3>
+<ul id="agents"></ul>
+<input id="aname" placeholder="Agent name">
+<input id="arank" placeholder="Rank">
+<button onclick="addAgent()">Add Agent</button>
+</div>
+
+<div class="section">
+<h3>Agent Live Chat</h3>
+<div id="chatBox"></div>
+<input id="chatInput" placeholder="message">
+<button onclick="sendChat()">Send</button>
+</div>
+
+<div class="section">
+<h3>Intel Files</h3>
+<button onclick="downloadIntel('Alpha Report')">Download Alpha Report</button>
+<button onclick="downloadIntel('Satellite Data')">Download Satellite Data</button>
+</div>
+
+<div class="section">
+<h3>Global Operations Map</h3>
+<div class="mapLocation" onclick="showMap('Arctic Listening Post')">Arctic Listening Post</div>
+<div class="mapLocation" onclick="showMap('Pacific Shadow Base')">Pacific Shadow Base</div>
+<div class="mapLocation" onclick="showMap('European Intel Hub')">European Intel Hub</div>
+<div class="mapLocation" onclick="showMap('Desert Black Site')">Desert Black Site</div>
+<div id="mapInfo"></div>
+</div>
+
+<div class="section" id="adminPanel" style="display:none">
+<h3>Admin Control Panel</h3>
+<input id="lockUser" placeholder="username">
+<button onclick="lockUserAccount()">Lock</button>
+<button onclick="unlockUserAccount()">Unlock</button>
+<br><br>
+<textarea id="announcement" placeholder="announcement"></textarea>
+<button onclick="sendAnnouncement()">Broadcast</button>
+</div>
+
+</div>
+
+<script>
+let users={
+"Shadow Umbra":{password:"Shadow Umbra",role:"owner",locked:false},
+"Admin1":{password:"Shadow01",role:"admin",locked:false},
+"Admin2":{password:"Shadow02",role:"admin",locked:false},
+"Admin3":{password:"Shadow03",role:"admin",locked:false},
+"Admin4":{password:"Shadow04",role:"admin",locked:false},
+"Agent1":{password:"Agent01",role:"member",locked:false},
+"Agent2":{password:"Agent02",role:"member",locked:false},
+"Agent3":{password:"Agent03",role:"member",locked:false},
+"Agent4":{password:"Agent04",role:"member",locked:false}
+}
+let currentUser=null
+
+function loginUser(){
+let u=document.getElementById("user").value
+let p=document.getElementById("pass").value
+if(users[u] && users[u].password===p){
+if(users[u].locked){
+document.getElementById("msg").innerHTML="ACCOUNT LOCKED"
+return
+}
+currentUser=u
+document.getElementById("loginBox").style.display="none"
+document.getElementById("panel").style.display="block"
+document.getElementById("welcome").innerHTML="Welcome "+u+" | "+users[u].role
+updateStatus()
+if(users[u].role==="admin" || users[u].role==="owner"){
+document.getElementById("adminPanel").style.display="block"
+}
+}else{
+document.getElementById("msg").innerHTML="ACCESS DENIED"
+}
+}
+
+function updateStatus(){
+document.getElementById("status").innerHTML=`
+Network: Online<br>
+Agents: ${document.getElementById("agents").children.length}<br>
+Missions: ${document.getElementById("missions").children.length}<br>
+Threat Level: Low
+`
+}
+
+function addMission(){
+let li=document.createElement("li")
+li.innerHTML=document.getElementById("mname").value+" — "+document.getElementById("mloc").value
+document.getElementById("missions").appendChild(li)
+updateStatus()
+}
+
+function addAgent(){
+let li=document.createElement("li")
+li.innerHTML=document.getElementById("aname").value+" | "+document.getElementById("arank").value
+document.getElementById("agents").appendChild(li)
+updateStatus()
+}
+
+function sendChat(){
+let msg=document.getElementById("chatInput").value
+let line=currentUser+": "+msg
+let chat=document.getElementById("chatBox")
+chat.innerHTML+="<br>"+line
+localStorage.setItem("shadowChat",chat.innerHTML)
+document.getElementById("chatInput").value=""
+}
+
+window.onload=function(){
+let saved=localStorage.getItem("shadowChat")
+if(saved){document.getElementById("chatBox").innerHTML=saved}
+}
+
+function downloadIntel(name){
+let blob=new Blob(["CLASSIFIED FILE: "+name])
+let a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download=name+".txt"
+a.click()
+}
+
+function showMap(loc){
+document.getElementById("mapInfo").innerHTML=
+"Location: "+loc+"<br>Status: Operational"
+}
+
+function lockUserAccount(){
+let u=document.getElementById("lockUser").value
+if(users[u]){users[u].locked=true; alert("User locked")}
+}
+
+function unlockUserAccount(){
+let u=document.getElementById("lockUser").value
+if(users[u]){users[u].locked=false; alert("User unlocked")}
+}
+
+function sendAnnouncement(){
+document.getElementById("announcements").innerHTML=
+document.getElementById("announcement").value
+}
+
+let input=document.getElementById("command")
+let term=document.getElementById("terminal")
+
+input.addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+let cmd=input.value
+term.innerHTML+="<br>> "+cmd
+run(cmd)
+input.value=""
+}
+})
+
+function run(cmd){
+cmd=cmd.toLowerCase()
+if(cmd==="help"){
+term.innerHTML+=`<br>Available Commands:
+<br>help
+<br>status
+<br>scan
+<br>agents
+<br>missions
+<br>create-agent
+<br>create-mission
+<br>report
+<br>download-intel
+<br>make-pdf
+<br>time
+<br>whoami
+<br>clear`
+}
+else if(cmd==="status"){term.innerHTML+="<br>AI: Shadow network operational."}
+else if(cmd==="scan"){term.innerHTML+="<br>Satellite scan initiated...<br>No threats detected."}
+else if(cmd==="agents"){term.innerHTML+="<br>"+document.getElementById("agents").innerText}
+else if(cmd==="missions"){term.innerHTML+="<br>"+document.getElementById("missions").innerText}
+else if(cmd==="create-agent"){term.innerHTML+="<br>Use Agent Profiles panel to create a new agent."}
+else if(cmd==="create-mission"){term.innerHTML+="<br>Use Mission Database panel to create a new mission."}
+else if(cmd==="download-intel"){downloadIntel("AI Generated Intel"); term.innerHTML+="<br>Intel file downloaded."}
+else if(cmd==="report"){
+let report="MISSION REPORT\nAgent:"+currentUser+"\nStatus: Completed"
+let blob=new Blob([report])
+let a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download="mission_report.txt"
+a.click()
+term.innerHTML+="<br>Report generated."
+}
+else if(cmd==="make-pdf"){
+let text="Shadow Organization Intelligence Report"
+let blob=new Blob([text],{type:"application/pdf"})
+let a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download="intel_report.pdf"
+a.click()
+term.innerHTML+="<br>PDF generated."
+}
+else if(cmd==="time"){term.innerHTML+="<br>"+new Date()}
+else if(cmd==="whoami"){term.innerHTML+="<br>User: "+currentUser}
+else if(cmd==="clear"){term.innerHTML=""}
+else{term.innerHTML+="<br>Unknown command. Type 'help'"}
+}
+</script>
+
+</body>
+</html>
