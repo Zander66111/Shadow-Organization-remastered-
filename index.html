@@ -1,308 +1,492 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Shadow Organization HQ</title>
+
+<title>Shadow Organization Command Network</title>
 
 <style>
+
 body{
-background:black;
-color:#00ff9f;
+background:#070707;
+color:#ff1a1a;
 font-family:Courier New;
 margin:0;
 }
+
 header{
-background:#001a14;
-padding:15px;
 text-align:center;
-border-bottom:1px solid #00ff9f;
+padding:20px;
+border-bottom:1px solid red;
 }
-#logo{
-font-size:26px;
-letter-spacing:4px;
+
+#title{
+font-size:28px;
+letter-spacing:5px;
 }
+
 #loginBox{
 position:absolute;
-top:40%;
+top:45%;
 left:50%;
 transform:translate(-50%,-50%);
-border:1px solid #00ff9f;
+border:1px solid red;
 padding:30px;
-text-align:center;
-}
-input,button,textarea{
 background:black;
-border:1px solid #00ff9f;
-color:#00ff9f;
-padding:8px;
+}
+
+input,button{
+background:black;
+border:1px solid red;
+color:red;
+padding:6px;
 margin:4px;
 }
-#panel{
+
+#tabs{
+display:none;
+text-align:center;
+background:#111;
+padding:10px;
+}
+
+.panel{
 display:none;
 padding:20px;
 }
+
 .section{
-border:1px solid #00ff9f;
+border:1px solid red;
 margin-top:15px;
 padding:10px;
 }
+
 #terminal{
-height:180px;
+height:200px;
 overflow:auto;
-border:1px solid #00ff9f;
+border:1px solid red;
 padding:10px;
 }
-#chatBox{
+
+#chat{
 height:150px;
 overflow:auto;
-border:1px solid #00ff9f;
+border:1px solid red;
 padding:10px;
 }
-.mapLocation{
-cursor:pointer;
-color:#00ffff;
+
+#aiChat{
+height:200px;
+overflow:auto;
+border:1px solid red;
+padding:10px;
 }
+
 </style>
+
 </head>
 
 <body>
 
 <header>
-<div id="logo">SHADOW ORGANIZATION HQ</div>
-<div id="announcements">No announcements</div>
+<div id="title">SHADOW ORGANIZATION NETWORK</div>
 </header>
 
 <div id="loginBox">
+
 <h2>Secure Login</h2>
+
 <input id="user" placeholder="Username"><br>
 <input id="pass" type="password" placeholder="Password"><br>
-<button onclick="loginUser()">ENTER</button>
+
+<button onclick="login()">ENTER</button>
+
 <p id="msg"></p>
+
 </div>
 
-<div id="panel">
-<h2 id="welcome"></h2>
+<div id="tabs">
 
-<div class="section">
-<h3>Live Status Dashboard</h3>
+<button onclick="openPanel('dashboard')">Dashboard</button>
+<button onclick="openPanel('missions')">Missions</button>
+<button onclick="openPanel('agents')">Agents</button>
+<button onclick="openPanel('terminalPanel')">Command AI</button>
+<button onclick="openPanel('chatPanel')">Agent Chat</button>
+<button onclick="openPanel('aiChatPanel')">AI Chat</button>
+<button onclick="openPanel('adminPanel')">Admin</button>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="panel">
+
+<h2>Status Dashboard</h2>
+
 <div id="status"></div>
+
 </div>
 
-<div class="section">
-<h3>AI Terminal</h3>
-<div id="terminal">Shadow AI Online</div>
-<input id="command" placeholder="command">
-</div>
+<!-- MISSIONS -->
 
-<div class="section">
-<h3>Mission Database</h3>
-<ul id="missions"></ul>
-<input id="mname" placeholder="Mission name">
-<input id="mloc" placeholder="Location">
+<div id="missions" class="panel">
+
+<h2>Missions</h2>
+
+<ul id="missionList"></ul>
+
+<input id="mName" placeholder="Mission name">
+<input id="mLoc" placeholder="Location">
+
 <button onclick="addMission()">Add Mission</button>
+
 </div>
 
-<div class="section">
-<h3>Agent Profiles</h3>
-<ul id="agents"></ul>
-<input id="aname" placeholder="Agent name">
-<input id="arank" placeholder="Rank">
+<!-- AGENTS -->
+
+<div id="agents" class="panel">
+
+<h2>Agents</h2>
+
+<ul id="agentList"></ul>
+
+<input id="aName" placeholder="Agent name">
+<input id="aRank" placeholder="Rank">
+
 <button onclick="addAgent()">Add Agent</button>
+
 </div>
 
-<div class="section">
-<h3>Agent Live Chat</h3>
-<div id="chatBox"></div>
-<input id="chatInput" placeholder="message">
+<!-- COMMAND AI -->
+
+<div id="terminalPanel" class="panel">
+
+<h2>Command AI</h2>
+
+<div id="terminal">Shadow Command AI Online</div>
+
+<input id="command" placeholder="Enter command">
+
+</div>
+
+<!-- CHAT -->
+
+<div id="chatPanel" class="panel">
+
+<h2>Agent Chat</h2>
+
+<div id="chat"></div>
+
+<input id="chatInput">
 <button onclick="sendChat()">Send</button>
-</div>
-
-<div class="section">
-<h3>Intel Files</h3>
-<button onclick="downloadIntel('Alpha Report')">Download Alpha Report</button>
-<button onclick="downloadIntel('Satellite Data')">Download Satellite Data</button>
-</div>
-
-<div class="section">
-<h3>Global Operations Map</h3>
-<div class="mapLocation" onclick="showMap('Arctic Listening Post')">Arctic Listening Post</div>
-<div class="mapLocation" onclick="showMap('Pacific Shadow Base')">Pacific Shadow Base</div>
-<div class="mapLocation" onclick="showMap('European Intel Hub')">European Intel Hub</div>
-<div class="mapLocation" onclick="showMap('Desert Black Site')">Desert Black Site</div>
-<div id="mapInfo"></div>
-</div>
-
-<div class="section" id="adminPanel" style="display:none">
-<h3>Admin Control Panel</h3>
-<input id="lockUser" placeholder="username">
-<button onclick="lockUserAccount()">Lock</button>
-<button onclick="unlockUserAccount()">Unlock</button>
-<br><br>
-<textarea id="announcement" placeholder="announcement"></textarea>
-<button onclick="sendAnnouncement()">Broadcast</button>
-</div>
 
 </div>
+
+<!-- AI CHAT -->
+
+<div id="aiChatPanel" class="panel">
+
+<h2>Shadow AI Assistant</h2>
+
+<div id="aiChat"></div>
+
+<input id="aiInput" placeholder="Ask the AI">
+<button onclick="chatAI()">Send</button>
+
+</div>
+
+<!-- ADMIN -->
+
+<div id="adminPanel" class="panel">
+
+<h2>Admin Panel</h2>
+
+<h3>Create User</h3>
+
+<input id="newUser" placeholder="username">
+<input id="newPass" placeholder="password">
+
+<button onclick="createUser()">Create</button>
+
+<h3>Lock User</h3>
+
+<input id="lockUserBox">
+
+<button onclick="lockUser()">Lock</button>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+
+/* USERS */
+
 let users={
+
 "Shadow Umbra":{password:"Shadow Umbra",role:"owner",locked:false},
+
 "Admin1":{password:"Shadow01",role:"admin",locked:false},
 "Admin2":{password:"Shadow02",role:"admin",locked:false},
 "Admin3":{password:"Shadow03",role:"admin",locked:false},
 "Admin4":{password:"Shadow04",role:"admin",locked:false},
-"Agent1":{password:"Agent01",role:"member",locked:false},
-"Agent2":{password:"Agent02",role:"member",locked:false},
-"Agent3":{password:"Agent03",role:"member",locked:false},
-"Agent4":{password:"Agent04",role:"member",locked:false}
+
+"Agent1":{password:"Agent01",role:"member",locked:false}
+
 }
+
 let currentUser=null
 
-function loginUser(){
+/* LOGIN */
+
+function login(){
+
 let u=document.getElementById("user").value
 let p=document.getElementById("pass").value
+
 if(users[u] && users[u].password===p){
+
 if(users[u].locked){
-document.getElementById("msg").innerHTML="ACCOUNT LOCKED"
+msg.innerHTML="ACCOUNT LOCKED"
 return
 }
+
 currentUser=u
-document.getElementById("loginBox").style.display="none"
-document.getElementById("panel").style.display="block"
-document.getElementById("welcome").innerHTML="Welcome "+u+" | "+users[u].role
+
+loginBox.style.display="none"
+tabs.style.display="block"
+
+openPanel("dashboard")
+
 updateStatus()
-if(users[u].role==="admin" || users[u].role==="owner"){
-document.getElementById("adminPanel").style.display="block"
-}
+
 }else{
-document.getElementById("msg").innerHTML="ACCESS DENIED"
-}
+
+msg.innerHTML="ACCESS DENIED"
+
 }
 
-function updateStatus(){
-document.getElementById("status").innerHTML=`
-Network: Online<br>
-Agents: ${document.getElementById("agents").children.length}<br>
-Missions: ${document.getElementById("missions").children.length}<br>
-Threat Level: Low
-`
 }
 
-function addMission(){
-let li=document.createElement("li")
-li.innerHTML=document.getElementById("mname").value+" — "+document.getElementById("mloc").value
-document.getElementById("missions").appendChild(li)
-updateStatus()
-}
+/* PANELS */
 
-function addAgent(){
-let li=document.createElement("li")
-li.innerHTML=document.getElementById("aname").value+" | "+document.getElementById("arank").value
-document.getElementById("agents").appendChild(li)
-updateStatus()
-}
+function openPanel(name){
 
-function sendChat(){
-let msg=document.getElementById("chatInput").value
-let line=currentUser+": "+msg
-let chat=document.getElementById("chatBox")
-chat.innerHTML+="<br>"+line
-localStorage.setItem("shadowChat",chat.innerHTML)
-document.getElementById("chatInput").value=""
-}
-
-window.onload=function(){
-let saved=localStorage.getItem("shadowChat")
-if(saved){document.getElementById("chatBox").innerHTML=saved}
-}
-
-function downloadIntel(name){
-let blob=new Blob(["CLASSIFIED FILE: "+name])
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download=name+".txt"
-a.click()
-}
-
-function showMap(loc){
-document.getElementById("mapInfo").innerHTML=
-"Location: "+loc+"<br>Status: Operational"
-}
-
-function lockUserAccount(){
-let u=document.getElementById("lockUser").value
-if(users[u]){users[u].locked=true; alert("User locked")}
-}
-
-function unlockUserAccount(){
-let u=document.getElementById("lockUser").value
-if(users[u]){users[u].locked=false; alert("User unlocked")}
-}
-
-function sendAnnouncement(){
-document.getElementById("announcements").innerHTML=
-document.getElementById("announcement").value
-}
-
-let input=document.getElementById("command")
-let term=document.getElementById("terminal")
-
-input.addEventListener("keypress",function(e){
-if(e.key==="Enter"){
-let cmd=input.value
-term.innerHTML+="<br>> "+cmd
-run(cmd)
-input.value=""
-}
+document.querySelectorAll(".panel").forEach(p=>{
+p.style.display="none"
 })
 
-function run(cmd){
-cmd=cmd.toLowerCase()
-if(cmd==="help"){
-term.innerHTML+=`<br>Available Commands:
-<br>help
-<br>status
-<br>scan
-<br>agents
-<br>missions
-<br>create-agent
-<br>create-mission
-<br>report
-<br>download-intel
-<br>make-pdf
-<br>time
-<br>whoami
-<br>clear`
+document.getElementById(name).style.display="block"
+
 }
-else if(cmd==="status"){term.innerHTML+="<br>AI: Shadow network operational."}
-else if(cmd==="scan"){term.innerHTML+="<br>Satellite scan initiated...<br>No threats detected."}
-else if(cmd==="agents"){term.innerHTML+="<br>"+document.getElementById("agents").innerText}
-else if(cmd==="missions"){term.innerHTML+="<br>"+document.getElementById("missions").innerText}
-else if(cmd==="create-agent"){term.innerHTML+="<br>Use Agent Profiles panel to create a new agent."}
-else if(cmd==="create-mission"){term.innerHTML+="<br>Use Mission Database panel to create a new mission."}
-else if(cmd==="download-intel"){downloadIntel("AI Generated Intel"); term.innerHTML+="<br>Intel file downloaded."}
-else if(cmd==="report"){
-let report="MISSION REPORT\nAgent:"+currentUser+"\nStatus: Completed"
-let blob=new Blob([report])
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download="mission_report.txt"
-a.click()
-term.innerHTML+="<br>Report generated."
+
+/* DASHBOARD */
+
+function updateStatus(){
+
+let agents=document.getElementById("agentList").children.length
+let missions=document.getElementById("missionList").children.length
+
+document.getElementById("status").innerHTML=
+
+"Network: Online<br>"+
+"Active Agents: "+agents+"<br>"+
+"Active Missions: "+missions+"<br>"+
+"Threat Level: Low"
+
 }
-else if(cmd==="make-pdf"){
-let text="Shadow Organization Intelligence Report"
-let blob=new Blob([text],{type:"application/pdf"})
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download="intel_report.pdf"
-a.click()
-term.innerHTML+="<br>PDF generated."
+
+/* MISSIONS */
+
+function addMission(){
+
+let li=document.createElement("li")
+
+li.innerText=mName.value+" — "+mLoc.value
+
+missionList.appendChild(li)
+
+updateStatus()
+
 }
-else if(cmd==="time"){term.innerHTML+="<br>"+new Date()}
-else if(cmd==="whoami"){term.innerHTML+="<br>User: "+currentUser}
-else if(cmd==="clear"){term.innerHTML=""}
-else{term.innerHTML+="<br>Unknown command. Type 'help'"}
+
+/* AGENTS */
+
+function addAgent(){
+
+let li=document.createElement("li")
+
+li.innerText=aName.value+" | "+aRank.value
+
+agentList.appendChild(li)
+
+updateStatus()
+
 }
+
+/* CHAT */
+
+function sendChat(){
+
+chat.innerHTML+="<br>"+currentUser+": "+chatInput.value
+
+chatInput.value=""
+
+}
+
+/* AI CHAT */
+
+function chatAI(){
+
+let msg=aiInput.value.toLowerCase()
+
+let response=""
+
+if(msg.includes("hello")){
+
+response="Hello agent. What can I help you with today?"
+
+}
+
+else if(msg.includes("who are you")){
+
+response="I am the Shadow Organization assistant AI designed to help agents."
+
+}
+
+else if(msg.includes("mission")){
+
+response="Current mission database is active. You can add or review missions in the missions tab."
+
+}
+
+else if(msg.includes("status")){
+
+response="All systems are operational. Network integrity is stable."
+
+}
+
+else if(msg.includes("shadow organization")){
+
+response="Shadow Organization is a covert intelligence and operations network."
+
+}
+
+else{
+
+response="Processing request... I am still learning but I will try to assist."
+
+}
+
+aiChat.innerHTML+="<br>You: "+msg
+aiChat.innerHTML+="<br>AI: "+response
+
+aiInput.value=""
+
+}
+
+/* ADMIN */
+
+function createUser(){
+
+let u=newUser.value
+let p=newPass.value
+
+users[u]={password:p,role:"member",locked:false}
+
+alert("User Created")
+
+}
+
+function lockUser(){
+
+let u=document.getElementById("lockUserBox").value
+
+if(users[u]){
+
+users[u].locked=true
+
+alert("User Locked")
+
+}
+
+}
+
+/* COMMAND AI */
+
+document.getElementById("command").addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+
+let cmd=this.value.toLowerCase()
+
+terminal.innerHTML+="<br>> "+cmd
+
+runCommand(cmd)
+
+this.value=""
+
+}
+
+})
+
+function runCommand(cmd){
+
+if(cmd=="hello"){
+
+terminal.innerHTML+="<br>AI: Greetings agent."
+
+}
+
+else if(cmd=="status"){
+
+terminal.innerHTML+="<br>AI: Shadow network operational."
+
+}
+
+else if(cmd=="agents"){
+
+terminal.innerHTML+="<br>"+agentList.innerText
+
+}
+
+else if(cmd=="missions"){
+
+terminal.innerHTML+="<br>"+missionList.innerText
+
+}
+
+else if(cmd=="make pdf"){
+
+createPDF()
+
+}
+
+else{
+
+terminal.innerHTML+="<br>AI: Command not recognized."
+
+}
+
+}
+
+/* PDF */
+
+function createPDF(){
+
+const { jsPDF } = window.jspdf
+
+const doc=new jsPDF()
+
+doc.text("Shadow Organization Intelligence Report",20,20)
+doc.text("Generated by "+currentUser,20,40)
+doc.text("System Status: Operational",20,60)
+
+doc.save("shadow_report.pdf")
+
+terminal.innerHTML+="<br>PDF generated successfully."
+
+}
+
 </script>
 
 </body>
