@@ -4,6 +4,8 @@
 
 <title>Shadow Organization Command Network</title>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
 <style>
 
 body{
@@ -16,11 +18,11 @@ margin:0;
 header{
 text-align:center;
 padding:20px;
-border-bottom:1px solid red;
+border-bottom:1px solid #8b0000;
 }
 
 #title{
-font-size:28px;
+font-size:30px;
 letter-spacing:5px;
 }
 
@@ -39,14 +41,14 @@ background:black;
 border:1px solid red;
 color:red;
 padding:6px;
-margin:4px;
+margin:5px;
 }
 
 #tabs{
 display:none;
-text-align:center;
 background:#111;
 padding:10px;
+text-align:center;
 }
 
 .panel{
@@ -60,25 +62,21 @@ margin-top:15px;
 padding:10px;
 }
 
-#terminal{
+#terminal,#chatBox{
 height:200px;
 overflow:auto;
 border:1px solid red;
 padding:10px;
 }
 
-#chat{
-height:150px;
-overflow:auto;
-border:1px solid red;
-padding:10px;
+#clock{
+font-size:18px;
+margin-top:10px;
 }
 
-#aiChat{
-height:200px;
-overflow:auto;
-border:1px solid red;
-padding:10px;
+#map{
+height:450px;
+border:2px solid red;
 }
 
 </style>
@@ -88,7 +86,14 @@ padding:10px;
 <body>
 
 <header>
-<div id="title">SHADOW ORGANIZATION NETWORK</div>
+
+<div id="title">SHADOW ORGANIZATION COMMAND NETWORK</div>
+
+<svg width="120" height="120" viewBox="0 0 500 500">
+<circle cx="250" cy="250" r="200" stroke="#8b0000" stroke-width="8" fill="none"/>
+<polygon points="250,90 280,220 420,220 300,300 340,430 250,350 160,430 200,300 80,220 220,220" fill="#8b0000"/>
+</svg>
+
 </header>
 
 <div id="loginBox">
@@ -100,8 +105,6 @@ padding:10px;
 
 <button onclick="login()">ENTER</button>
 
-<p id="msg"></p>
-
 </div>
 
 <div id="tabs">
@@ -109,10 +112,10 @@ padding:10px;
 <button onclick="openPanel('dashboard')">Dashboard</button>
 <button onclick="openPanel('missions')">Missions</button>
 <button onclick="openPanel('agents')">Agents</button>
+<button onclick="openPanel('mapPanel')">Operations Map</button>
+<button onclick="openPanel('intel')">Intel</button>
 <button onclick="openPanel('terminalPanel')">Command AI</button>
-<button onclick="openPanel('chatPanel')">Agent Chat</button>
-<button onclick="openPanel('aiChatPanel')">AI Chat</button>
-<button onclick="openPanel('adminPanel')">Admin</button>
+<button onclick="openPanel('chatPanel')">AI Chat</button>
 
 </div>
 
@@ -120,9 +123,14 @@ padding:10px;
 
 <div id="dashboard" class="panel">
 
-<h2>Status Dashboard</h2>
+<h2>System Status</h2>
 
-<div id="status"></div>
+<div id="clock"></div>
+
+<div class="section">
+Network Status: ONLINE<br>
+Threat Level: LOW
+</div>
 
 </div>
 
@@ -130,12 +138,13 @@ padding:10px;
 
 <div id="missions" class="panel">
 
-<h2>Missions</h2>
+<h2>Mission Database</h2>
 
 <ul id="missionList"></ul>
 
-<input id="mName" placeholder="Mission name">
-<input id="mLoc" placeholder="Location">
+<input id="mName" placeholder="Mission Name">
+<input id="mLat" placeholder="Latitude">
+<input id="mLng" placeholder="Longitude">
 
 <button onclick="addMission()">Add Mission</button>
 
@@ -145,14 +154,34 @@ padding:10px;
 
 <div id="agents" class="panel">
 
-<h2>Agents</h2>
+<h2>Agent Profiles</h2>
 
 <ul id="agentList"></ul>
 
-<input id="aName" placeholder="Agent name">
+<input id="aName" placeholder="Agent Name">
 <input id="aRank" placeholder="Rank">
 
 <button onclick="addAgent()">Add Agent</button>
+
+</div>
+
+<!-- MAP -->
+
+<div id="mapPanel" class="panel">
+
+<h2>Global Operations Map</h2>
+
+<div id="map"></div>
+
+</div>
+
+<!-- INTEL -->
+
+<div id="intel" class="panel">
+
+<h2>Intel Vault</h2>
+
+<button onclick="makePDF()">Generate Intel Report PDF</button>
 
 </div>
 
@@ -160,138 +189,95 @@ padding:10px;
 
 <div id="terminalPanel" class="panel">
 
-<h2>Command AI</h2>
+<h2>Shadow Command AI</h2>
 
-<div id="terminal">Shadow Command AI Online</div>
+<div id="terminal">Shadow AI Ready — type "help"</div>
 
 <input id="command" placeholder="Enter command">
 
 </div>
 
-<!-- CHAT -->
+<!-- CHAT AI -->
 
 <div id="chatPanel" class="panel">
 
-<h2>Agent Chat</h2>
-
-<div id="chat"></div>
-
-<input id="chatInput">
-<button onclick="sendChat()">Send</button>
-
-</div>
-
-<!-- AI CHAT -->
-
-<div id="aiChatPanel" class="panel">
-
 <h2>Shadow AI Assistant</h2>
 
-<div id="aiChat"></div>
+<div id="chatBox"></div>
 
 <input id="aiInput" placeholder="Ask the AI">
 <button onclick="chatAI()">Send</button>
 
 </div>
 
-<!-- ADMIN -->
-
-<div id="adminPanel" class="panel">
-
-<h2>Admin Panel</h2>
-
-<h3>Create User</h3>
-
-<input id="newUser" placeholder="username">
-<input id="newPass" placeholder="password">
-
-<button onclick="createUser()">Create</button>
-
-<h3>Lock User</h3>
-
-<input id="lockUserBox">
-
-<button onclick="lockUser()">Lock</button>
-
-</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
-/* USERS */
-
 let users={
-
-"Shadow Umbra":{password:"Shadow Umbra",role:"owner",locked:false},
-
-"Admin1":{password:"Shadow01",role:"admin",locked:false},
-"Admin2":{password:"Shadow02",role:"admin",locked:false},
-"Admin3":{password:"Shadow03",role:"admin",locked:false},
-"Admin4":{password:"Shadow04",role:"admin",locked:false},
-
-"Agent1":{password:"Agent01",role:"member",locked:false}
-
+"Shadow Umbra":{password:"Shadow Umbra"}
 }
 
 let currentUser=null
 
-/* LOGIN */
-
 function login(){
 
-let u=document.getElementById("user").value
-let p=document.getElementById("pass").value
+if(users[user.value] && users[user.value].password===pass.value){
 
-if(users[u] && users[u].password===p){
-
-if(users[u].locked){
-msg.innerHTML="ACCOUNT LOCKED"
-return
-}
-
-currentUser=u
+currentUser=user.value
 
 loginBox.style.display="none"
 tabs.style.display="block"
 
 openPanel("dashboard")
 
-updateStatus()
+startClock()
 
-}else{
-
-msg.innerHTML="ACCESS DENIED"
+initMap()
 
 }
 
 }
-
-/* PANELS */
 
 function openPanel(name){
 
-document.querySelectorAll(".panel").forEach(p=>{
-p.style.display="none"
-})
+document.querySelectorAll(".panel").forEach(p=>p.style.display="none")
 
 document.getElementById(name).style.display="block"
 
 }
 
-/* DASHBOARD */
+/* CLOCK */
 
-function updateStatus(){
+function startClock(){
 
-let agents=document.getElementById("agentList").children.length
-let missions=document.getElementById("missionList").children.length
+setInterval(()=>{
 
-document.getElementById("status").innerHTML=
+let now=new Date()
 
-"Network: Online<br>"+
-"Active Agents: "+agents+"<br>"+
-"Active Missions: "+missions+"<br>"+
-"Threat Level: Low"
+clock.innerHTML=
+"Day: "+now.toLocaleDateString(undefined,{weekday:"long"})+
+"<br>Date: "+now.toLocaleDateString()+
+"<br>Time: "+now.toLocaleTimeString()
+
+},1000)
+
+}
+
+/* MAP */
+
+let map
+
+function initMap(){
+
+map=L.map('map').setView([20,0],2)
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{maxZoom:19}
+).addTo(map)
 
 }
 
@@ -299,13 +285,15 @@ document.getElementById("status").innerHTML=
 
 function addMission(){
 
+let name=mName.value
+let lat=parseFloat(mLat.value)
+let lng=parseFloat(mLng.value)
+
 let li=document.createElement("li")
-
-li.innerText=mName.value+" — "+mLoc.value
-
+li.innerText=name+" ("+lat+","+lng+")"
 missionList.appendChild(li)
 
-updateStatus()
+L.marker([lat,lng]).addTo(map).bindPopup(name)
 
 }
 
@@ -314,176 +302,82 @@ updateStatus()
 function addAgent(){
 
 let li=document.createElement("li")
-
 li.innerText=aName.value+" | "+aRank.value
-
 agentList.appendChild(li)
-
-updateStatus()
-
-}
-
-/* CHAT */
-
-function sendChat(){
-
-chat.innerHTML+="<br>"+currentUser+": "+chatInput.value
-
-chatInput.value=""
-
-}
-
-/* AI CHAT */
-
-function chatAI(){
-
-let msg=aiInput.value.toLowerCase()
-
-let response=""
-
-if(msg.includes("hello")){
-
-response="Hello agent. What can I help you with today?"
-
-}
-
-else if(msg.includes("who are you")){
-
-response="I am the Shadow Organization assistant AI designed to help agents."
-
-}
-
-else if(msg.includes("mission")){
-
-response="Current mission database is active. You can add or review missions in the missions tab."
-
-}
-
-else if(msg.includes("status")){
-
-response="All systems are operational. Network integrity is stable."
-
-}
-
-else if(msg.includes("shadow organization")){
-
-response="Shadow Organization is a covert intelligence and operations network."
-
-}
-
-else{
-
-response="Processing request... I am still learning but I will try to assist."
-
-}
-
-aiChat.innerHTML+="<br>You: "+msg
-aiChat.innerHTML+="<br>AI: "+response
-
-aiInput.value=""
-
-}
-
-/* ADMIN */
-
-function createUser(){
-
-let u=newUser.value
-let p=newPass.value
-
-users[u]={password:p,role:"member",locked:false}
-
-alert("User Created")
-
-}
-
-function lockUser(){
-
-let u=document.getElementById("lockUserBox").value
-
-if(users[u]){
-
-users[u].locked=true
-
-alert("User Locked")
-
-}
-
-}
-
-/* COMMAND AI */
-
-document.getElementById("command").addEventListener("keypress",function(e){
-
-if(e.key==="Enter"){
-
-let cmd=this.value.toLowerCase()
-
-terminal.innerHTML+="<br>> "+cmd
-
-runCommand(cmd)
-
-this.value=""
-
-}
-
-})
-
-function runCommand(cmd){
-
-if(cmd=="hello"){
-
-terminal.innerHTML+="<br>AI: Greetings agent."
-
-}
-
-else if(cmd=="status"){
-
-terminal.innerHTML+="<br>AI: Shadow network operational."
-
-}
-
-else if(cmd=="agents"){
-
-terminal.innerHTML+="<br>"+agentList.innerText
-
-}
-
-else if(cmd=="missions"){
-
-terminal.innerHTML+="<br>"+missionList.innerText
-
-}
-
-else if(cmd=="make pdf"){
-
-createPDF()
-
-}
-
-else{
-
-terminal.innerHTML+="<br>AI: Command not recognized."
-
-}
 
 }
 
 /* PDF */
 
-function createPDF(){
+function makePDF(){
 
 const { jsPDF } = window.jspdf
 
 const doc=new jsPDF()
 
-doc.text("Shadow Organization Intelligence Report",20,20)
-doc.text("Generated by "+currentUser,20,40)
-doc.text("System Status: Operational",20,60)
+doc.text("Shadow Organization Intel Report",20,20)
 
 doc.save("shadow_report.pdf")
 
-terminal.innerHTML+="<br>PDF generated successfully."
+}
+
+/* COMMAND AI */
+
+command.addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+
+let cmd=command.value.toLowerCase()
+
+terminal.innerHTML+="<br>> "+cmd
+
+let now=new Date()
+
+if(cmd==="help"){
+terminal.innerHTML+=`
+<br>COMMAND LIST
+<br>help
+<br>time
+<br>date
+<br>day
+<br>status
+<br>clear
+<br>make pdf
+`
+}
+
+else if(cmd==="time") terminal.innerHTML+="<br>"+now.toLocaleTimeString()
+else if(cmd==="date") terminal.innerHTML+="<br>"+now.toLocaleDateString()
+else if(cmd==="day") terminal.innerHTML+="<br>"+now.toLocaleDateString(undefined,{weekday:"long"})
+else if(cmd==="status") terminal.innerHTML+="<br>Shadow Network Online"
+else if(cmd==="clear") terminal.innerHTML="Shadow AI Ready"
+else if(cmd==="make pdf") makePDF()
+
+command.value=""
+
+}
+
+})
+
+/* CHAT AI */
+
+function chatAI(){
+
+let text=aiInput.value.toLowerCase()
+let now=new Date()
+
+let reply="Processing..."
+
+if(text.includes("hello")) reply="Hello agent "+currentUser
+else if(text.includes("time")) reply="Time: "+now.toLocaleTimeString()
+else if(text.includes("date")) reply="Date: "+now.toLocaleDateString()
+else if(text.includes("day")) reply="Today is "+now.toLocaleDateString(undefined,{weekday:"long"})
+else reply="Shadow AI analyzing your request."
+
+chatBox.innerHTML+="<br>You: "+text
+chatBox.innerHTML+="<br>AI: "+reply
+
+aiInput.value=""
 
 }
 
