@@ -786,5 +786,585 @@ document.getElementById("clock").innerHTML=new Date().toLocaleString()
 
 </script>
 
+<script>
+
+/* =========================
+SHADOW HQ EXTENSION PACK 2
+Advanced Systems Upgrade
+========================= */
+
+/* ===== ADD 40 MORE RANKS ===== */
+
+if(typeof ranks !== "undefined"){
+
+ranks.push(
+
+"Phantom Sentinel",
+"Umbra Warlord",
+"Shadow Executor",
+"Nightfall Commander",
+"Void Strategist",
+"Phantom Marshal",
+"Umbra Regent",
+"Shadow Dominator",
+"Silent Emperor",
+"Night Sovereign",
+"Void General",
+"Phantom Overlord",
+"Umbra Chancellor",
+"Shadow Monarch",
+"Nightfall Architect",
+"Void Commander",
+"Phantom Tyrant",
+"Umbra Vanguard",
+"Shadow Supreme",
+"Nightfall Specter",
+"Void Overseer Prime",
+"Phantom Dominus",
+"Umbra High Regent",
+"Shadow High Warden",
+"Nightfall Prime",
+"Void Sovereign Prime",
+"Phantom Emperor",
+"Umbra Apex",
+"Shadow Titan",
+"Nightfall Ascendant",
+"Void King",
+"Phantom King Eternal",
+"Umbra Overlord Prime",
+"Shadow Godhand",
+"Nightfall Sovereign",
+"Void Dominator",
+"Phantom Prime",
+"Umbra Eternal",
+"Shadow Infinite",
+"Umbra Omni Commander"
+
+)
+
+}
+
+/* ===== SHADOW CURRENCY SYSTEM ===== */
+
+let shadowCredits=1000
+
+function addCredits(amount){
+
+shadowCredits+=amount
+updateCredits()
+
+}
+
+function spendCredits(amount){
+
+if(shadowCredits>=amount){
+
+shadowCredits-=amount
+updateCredits()
+
+}else{
+
+alert("Not enough Shadow Credits")
+
+}
+
+}
+
+function updateCredits(){
+
+let dash=document.getElementById("status")
+
+if(dash){
+
+dash.innerHTML+="<br>Shadow Credits: "+shadowCredits
+
+}
+
+}
+
+/* ===== AGENT PROFILE SYSTEM ===== */
+
+function viewAgentProfile(name){
+
+if(!users[name]) return
+
+let data=users[name]
+
+let profile=`
+AGENT PROFILE
+-------------
+Name: ${name}
+Rank: ${ranks[data.rank]}
+Role: ${data.role}
+Status: ACTIVE
+`
+
+alert(profile)
+
+}
+
+/* ===== MISSION ACCEPT / DECLINE ===== */
+
+function renderMissionBoard(){
+
+let board=document.getElementById("missionList")
+
+if(!board) return
+
+board.innerHTML=""
+
+missions.forEach((m,i)=>{
+
+let li=document.createElement("li")
+
+li.innerHTML=`
+${m.name} - ${m.location}
+
+<button onclick="acceptMission(${i})">Accept</button>
+<button onclick="declineMission(${i})">Decline</button>
+`
+
+board.appendChild(li)
+
+})
+
+}
+
+function declineMission(i){
+
+alert("Mission declined")
+
+}
+
+/* ===== GLOBAL FACTION MAP ===== */
+
+function initFactionMap(){
+
+let map=L.map('map').setView([20,0],2)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+
+let bases=[
+
+["Arctic Command",78,-20],
+["Pacific Hub",-15,120],
+["European Intel",50,10],
+["Desert Black Site",23,45],
+["Amazon Shadow Base",-3,-60]
+
+]
+
+bases.forEach(b=>{
+
+L.marker([b[1],b[2]]).addTo(map).bindPopup(b[0])
+
+})
+
+}
+
+/* ===== SATELLITE IMAGERY VIEWER ===== */
+
+function satelliteScan(){
+
+let term=document.getElementById("terminalBox")
+
+if(term){
+
+term.innerHTML+="<br>Satellite uplink established..."
+
+setTimeout(()=>{
+
+term.innerHTML+="<br>Thermal signatures detected."
+
+},1500)
+
+setTimeout(()=>{
+
+term.innerHTML+="<br>Orbital imaging complete."
+
+},3000)
+
+}
+
+}
+
+/* ===== AI COMMANDER ASSISTANT ===== */
+
+function commanderAI(text){
+
+text=text.toLowerCase()
+
+if(text.includes("mission"))
+return "Commander: Missions available in mission board."
+
+if(text.includes("rank"))
+return "Commander: Your rank determines your authority."
+
+if(text.includes("scan"))
+return "Commander: Use the scan command for satellite sweeps."
+
+if(text.includes("intel"))
+return "Commander: Classified intel is stored in the archives."
+
+return "Commander: Awaiting further orders."
+
+}
+
+/* ===== EXTEND TERMINAL COMMANDS ===== */
+
+if(typeof command==="function"){
+
+let oldCommand=command
+
+command=function(){
+
+let input=document.getElementById("cmd").value.toLowerCase()
+
+if(input==="satellite"){
+
+satelliteScan()
+return
+
+}
+
+if(input==="credits"){
+
+document.getElementById("terminalBox").innerHTML+="<br>Credits: "+shadowCredits
+return
+
+}
+
+if(input.startsWith("profile")){
+
+let name=input.split(" ")[1]
+
+viewAgentProfile(name)
+
+return
+
+}
+
+if(input==="commander"){
+
+document.getElementById("terminalBox").innerHTML+="<br>"+commanderAI("status")
+
+return
+
+}
+
+oldCommand()
+
+}
+
+}
+
+/* ===== AUTO LOAD EXTENSION SYSTEMS ===== */
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+renderMissionBoard()
+updateCredits()
+
+},1200)
+
+})
+
+</script>
+
+</body>
+<script>
+
+/* =========================
+SHADOW HQ EXTENSION PACK 3
+ULTRA SYSTEM EXPANSION
+========================= */
+
+
+/* ===== ADD 100 MORE RANKS ===== */
+
+if(typeof ranks !== "undefined"){
+
+for(let i=1;i<=100;i++){
+
+ranks.push("Shadow Elite Tier "+i)
+
+}
+
+}
+
+
+/* ===== WORLD THREAT TRACKER ===== */
+
+let globalThreatLevel=1
+
+function updateThreat(){
+
+globalThreatLevel=Math.floor(Math.random()*5)+1
+
+let status=document.getElementById("status")
+
+if(status){
+
+let levels=[
+"LOW",
+"GUARDED",
+"ELEVATED",
+"HIGH",
+"CRITICAL"
+]
+
+status.innerHTML+="<br>Global Threat Level: "+levels[globalThreatLevel-1]
+
+}
+
+}
+
+setInterval(updateThreat,15000)
+
+
+/* ===== SHADOW ARMY ROSTER ===== */
+
+let shadowArmy=[]
+
+function recruitSoldier(name){
+
+shadowArmy.push({
+name:name,
+rank:"Shadow Soldier",
+status:"Active"
+})
+
+}
+
+function showArmy(){
+
+let list="Shadow Army Roster\n\n"
+
+shadowArmy.forEach(s=>{
+
+list+=s.name+" | "+s.rank+"\n"
+
+})
+
+alert(list)
+
+}
+
+
+/* ===== INTEL FILE DOWNLOAD SYSTEM ===== */
+
+let intelDatabase=[
+
+"Arctic Surveillance Data",
+"Shadow Satellite Logs",
+"Global Network Traffic",
+"Umbra Recon Report",
+"Nightfall Operation Files"
+
+]
+
+function downloadIntelFile(i){
+
+let data=intelDatabase[i]
+
+let blob=new Blob([data])
+
+let a=document.createElement("a")
+
+a.href=URL.createObjectURL(blob)
+
+a.download=data+".txt"
+
+a.click()
+
+}
+
+
+/* ===== AI MISSION GENERATOR ===== */
+
+let missionTypes=[
+"Infiltration",
+"Recon",
+"Sabotage",
+"Extraction",
+"Surveillance",
+"Cyber Warfare"
+]
+
+let missionLocations=[
+"Arctic Facility",
+"Desert Outpost",
+"Pacific Platform",
+"Mountain Bunker",
+"Urban Safehouse"
+]
+
+function generateMission(){
+
+let type=missionTypes[Math.floor(Math.random()*missionTypes.length)]
+let loc=missionLocations[Math.floor(Math.random()*missionLocations.length)]
+
+let mission={
+name:type+" Operation",
+location:loc,
+assigned:false
+}
+
+missions.push(mission)
+
+alert("New Mission Generated: "+mission.name+" at "+mission.location)
+
+}
+
+
+/* ===== SATELLITE RADAR ANIMATION ===== */
+
+function startRadar(){
+
+let radar=document.createElement("div")
+
+radar.style.position="fixed"
+radar.style.bottom="20px"
+radar.style.left="20px"
+radar.style.width="120px"
+radar.style.height="120px"
+radar.style.border="2px solid red"
+radar.style.borderRadius="50%"
+radar.style.animation="spinRadar 4s linear infinite"
+
+document.body.appendChild(radar)
+
+}
+
+let style=document.createElement("style")
+
+style.innerHTML=`
+
+@keyframes spinRadar{
+
+0%{transform:rotate(0deg)}
+
+100%{transform:rotate(360deg)}
+
+}
+
+`
+
+document.head.appendChild(style)
+
+
+/* ===== SECRET OWNER BACKDOOR ===== */
+
+function shadowBackdoor(){
+
+if(currentUser==="Shadow Umbra"){
+
+alert("Umbra Override Activated")
+
+addCredits(5000)
+
+}
+
+}
+
+
+/* ===== TERMINAL COMMAND EXPANSION ===== */
+
+if(typeof command==="function"){
+
+let oldCommand=command
+
+command=function(){
+
+let c=document.getElementById("cmd").value.toLowerCase()
+
+if(c==="army"){
+
+showArmy()
+return
+
+}
+
+if(c==="missiongen"){
+
+generateMission()
+return
+
+}
+
+if(c==="threat"){
+
+updateThreat()
+return
+
+}
+
+if(c==="radar"){
+
+startRadar()
+return
+
+}
+
+if(c==="umbra"){
+
+shadowBackdoor()
+return
+
+}
+
+oldCommand()
+
+}
+
+}
+
+
+/* ===== ADD NEW HQ TABS ===== */
+
+function addUltraTabs(){
+
+let header=document.querySelector("header")
+
+if(!header) return
+
+let tabs=[
+
+"Army",
+"Intel",
+"Threat",
+"Radar",
+"Command"
+
+]
+
+tabs.forEach(t=>{
+
+let tab=document.createElement("div")
+
+tab.className="tab"
+
+tab.innerText=t
+
+header.appendChild(tab)
+
+})
+
+}
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+addUltraTabs()
+
+},1500)
+
+})
+
+</script>
+
 </body>
 </html>
